@@ -13,16 +13,25 @@ void Image::Transform()
         for (u_int16_t y = 0; y < size.y; ++y)
         {
             sf::Color color = m_img.getPixel(x, y);
-            u_int16_t colorAmount = (color.r + color.g + color.b)/3;
-            m_img.setPixel(x, y, sf::Color(colorAmount, colorAmount, colorAmount));
+            u_int16_t colorAverage = (color.r + color.g + color.b)/3;
+            m_img.setPixel(x, y, sf::Color(colorAverage, colorAverage, colorAverage));
         }
     }
 }
 
-sf::Texture Image::GetAsTexture()
+sf::Texture Image::GetAsTexture() const 
 {
-    m_img.saveToFile("../images/zdj1.jpg/");
-    sf::Texture img;
-    img.loadFromFile("../images/zdj1.jpg/");
-    return img;
+    sf::Texture texture;
+    texture.loadFromImage(m_img);
+    return texture;
+}
+
+sf::Image& Image::GetImage()
+{
+    return m_img;
+}
+
+sf::Vector2f Image::GetResolution() const
+{
+    return sf::Vector2f(m_img.getSize());
 }
