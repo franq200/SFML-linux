@@ -1,44 +1,44 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "../include/Image.h"
-#include <X11/Xlib.h>
 
-Display* d = XOpenDisplay(NULL);
-Screen*  s = DefaultScreenOfDisplay(d);
-
-
-int main(int argc, char* argv[])
+std::pair<unsigned int, unsigned int> GetScreenSize()
 {
-    std::cout << s->height << '\n' << s->width << std::flush;
-    sf::RenderWindow window(sf::VideoMode(s->width, s->height), "SFML works!");
+    unsigned int screenWidth = sf::VideoMode::getDesktopMode().width;
+    unsigned int screenHeight = sf::VideoMode::getDesktopMode().height;
+    return {screenWidth, screenHeight};
+}
 
-    std::string path = argv[1];
-    Image image(path);
-    image.Transform();
-    sf::Sprite shape;
-    sf::Texture texture;
-    texture.loadFromImage(image.GetImage());
+void FitImageToScreen(const Image& image, sf::Sprite& shape, const unsigned int screenWidth, const unsigned int screenHeight)
+{
     sf::Vector2f imageSize = image.GetResolution();
-    shape.setPosition(0, 0);
-    shape.setTexture(texture);
-    float height = s->height/imageSize.y;
-    float width = s->width/imageSize.x;
-    if (height < width)
+    float heightScale = screenHeight/imageSize.y;
+    float widthScale = screenWidth/imageSize.x;
+    if (heightScale < widthScale)
     {
-        shape.setScale({height, height});
-        shape.setPosition(std::abs(s->width - imageSize.x)/2, 0);
-        std::cout << s->width << '\n' << imageSize.x << '\n' << std::abs(s->width - imageSize.x) << '\n';
+        shape.setScale({heightScale, heightScale});
+        shape.setPosition(std::abs(screenWidth - imageSize.x * heightScale)/2, 0);
     }
     else
     {
-        shape.setScale({width, width});
-        shape.setPosition(0, std::abs(s->height - imageSize.y)/2);
+        shape.setScale({widthScale, widthScale});
+        shape.setPosition(0, std::abs(screenHeight - imageSize.y * widthScale)/2);
     }
-    sf::RectangleShape shape2;
-    shape2.setSize({20, 20});
-    shape2.setFillColor(sf::Color::Cyan);
-    shape2.setPosition(s->width-2, 0);
+}
 
+sf::Sprite PrepareToDraw(const Image& image)
+{
+    sf::Texture texture;
+    texture.loadFromImage(image.GetImage());
+
+    sf::Sprite shape;
+    shape.setPosition(0, 0);
+    shape.setTexture(texture);
+    return shape;
+}
+
+void Run(sf::RenderWindow& window, const sf::Sprite& shape)
+{
     while (window.isOpen())
     {
         sf::Event event;
@@ -50,9 +50,22 @@ int main(int argc, char* argv[])
 
         window.clear();
         window.draw(shape);
-        window.draw(shape2);
         window.display();
     }
+}
+
+int main(int argc, char* argv[])
+{
+    const auto [screenWidth, screenHeight] = GetScreenSize();
+
+    sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), "SFML works!");
+
+    Image image(argc > 1 ? argv[1] : "..//images//zdj1.jpg");
+    image.Transform();
+
+    sf::Sprite shape = PrepareToDraw(image);
+    FitImageToScreen(image, shape, screenWidth, screenHeight);
+    Run(window, shape);
 
     return 0;
 }

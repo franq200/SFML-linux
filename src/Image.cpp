@@ -26,7 +26,7 @@ sf::Texture Image::GetAsTexture() const
     return texture;
 }
 
-sf::Image& Image::GetImage()
+const sf::Image& Image::GetImage() const
 {
     return m_img;
 }
