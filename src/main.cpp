@@ -28,7 +28,7 @@ void FitImageToScreen(const Image& image, sf::Sprite& shape, const unsigned int 
 
 sf::Sprite PrepareToDraw(const Image& image)
 {
-    sf::Texture texture;
+    static sf::Texture texture;
     texture.loadFromImage(image.GetImage());
 
     sf::Sprite shape;
@@ -64,6 +64,13 @@ int main(int argc, char* argv[])
     image.Transform();
 
     sf::Sprite shape = PrepareToDraw(image);
+    /*
+    sf::Texture texture;
+    texture.loadFromImage(image.GetImage());
+
+    shape.setPosition(0, 0);
+    shape.setTexture(texture); // raczej błąd
+    */
     FitImageToScreen(image, shape, screenWidth, screenHeight);
     Run(window, shape);
 
