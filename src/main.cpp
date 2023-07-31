@@ -4,9 +4,7 @@
 
 std::pair<unsigned int, unsigned int> GetScreenSize()
 {
-    unsigned int screenWidth = sf::VideoMode::getDesktopMode().width;
-    unsigned int screenHeight = sf::VideoMode::getDesktopMode().height;
-    return {screenWidth, screenHeight};
+    return {sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height};
 }
 
 void FitImageToScreen(const Image& image, sf::Sprite& shape, const unsigned int screenWidth, const unsigned int screenHeight)
@@ -53,10 +51,25 @@ void ViewControl(sf::View& view, sf::Event& event)
         timer.restart();
         return;
     }
+    /*
     if(event.type == sf::Event::MouseWheelMoved)
     {
+        sf::Vector2i mousePos = sf::Mouse::getPosition();
+        view.setCenter(mousePos.x, mousePos.y);
         view.zoom((-1 * event.mouseWheel.delta) * 0.02 + 1);
     }
+    */
+    
+    if(event.type == sf::Event::MouseWheelMoved)
+    {
+        unsigned int screenH = sf::VideoMode::getDesktopMode().height;
+        unsigned int screenW = sf::VideoMode::getDesktopMode().width;
+        sf::Vector2i mousePos = sf::Mouse::getPosition();
+        float scroll = (-1 * event.mouseWheel.delta) * 0.02 + 1;
+        view.zoom(scroll);
+        view.move((mousePos.x - screenW/2)*0.02, (mousePos.y- screenH/2)*0.02);
+    }
+    
 }
 
 void Run(sf::RenderWindow& window, const sf::Sprite& shape, sf::View& view)
