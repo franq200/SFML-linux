@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.26.5)
 
 project(SFML)
+add_compile_options(-Wall -Wextra -Wpedantic)
 
 file (GLOB src_files src/*.cpp)
 include_directories(${Animals_SOURCE_DIR}/include)

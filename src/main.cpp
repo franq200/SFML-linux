@@ -2,6 +2,16 @@
 #include <iostream>
 #include "../include/Image.h"
 
+void MouseScroll(sf::View& view, const sf::Event& event)
+{
+    const auto [screenW, screenH] = GetScreenSize();
+    sf::Vector2i mousePos = sf::Mouse::getPosition();
+    float moveStep = event.mouseWheel.delta * -0.02;
+    float scroll = 1 + moveStep;
+    view.zoom(scroll);
+    view.move((mousePos.x - static_cast<int>(screenW)/2)*(mousePos.x/static_cast<int>(screenW))*moveStep, (mousePos.y - static_cast<int>(screenH)/2)*(mousePos.y/static_cast<int>(screenH))*moveStep);
+}
+
 std::pair<unsigned int, unsigned int> GetScreenSize()
 {
     return {sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height};
@@ -51,25 +61,11 @@ void ViewControl(sf::View& view, sf::Event& event)
         timer.restart();
         return;
     }
-    /*
-    if(event.type == sf::Event::MouseWheelMoved)
-    {
-        sf::Vector2i mousePos = sf::Mouse::getPosition();
-        view.setCenter(mousePos.x, mousePos.y);
-        view.zoom((-1 * event.mouseWheel.delta) * 0.02 + 1);
-    }
-    */
     
     if(event.type == sf::Event::MouseWheelMoved)
     {
-        unsigned int screenH = sf::VideoMode::getDesktopMode().height;
-        unsigned int screenW = sf::VideoMode::getDesktopMode().width;
-        sf::Vector2i mousePos = sf::Mouse::getPosition();
-        float scroll = (-1 * event.mouseWheel.delta) * 0.02 + 1;
-        view.zoom(scroll);
-        view.move((mousePos.x - screenW/2)*0.02, (mousePos.y- screenH/2)*0.02);
+        MouseScroll(view, event);
     }
-    
 }
 
 void Run(sf::RenderWindow& window, const sf::Sprite& shape, sf::View& view)
